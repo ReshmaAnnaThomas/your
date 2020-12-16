@@ -208,10 +208,10 @@ class PsrfitsFile(object):
         sdata = self.fits["SUBINT"].data[isub]["DATA"]
         shp = sdata.squeeze().shape
 
-        if pol > 0:
-            assert (
-                self.poln_order == "IQUV"
-            ), "Polarisation order in the file should be IQUV with pol=1 or pol=2"
+        #if pol > 0:
+            #assert (
+                #self.poln_order == "IQUV"
+            #), "Polarisation order in the file should be IQUV with pol=1 or pol=2"
 
         if self.nbits < 8:  # Unpack the bytes data
             if (shp[0] != self.nsamp_per_subint) and (
@@ -229,10 +229,21 @@ class PsrfitsFile(object):
         else:
             # Handle 4-poln GUPPI/PUPPI data
             if len(shp) == 3 and shp[1] == self.npoln and self.poln_order == "AABBCRCI":
-                logger.warning("Polarization is AABBCRCI, summing AA and BB")
+                logger.warning("Polarization is AABBCRCI")
                 data = np.zeros((self.nsamp_per_subint, self.nchan), dtype=np.float32)
-                data += sdata[:, 0, :].squeeze()
-                data += sdata[:, 1, :].squeeze()
+                if pol==0:
+                   logger.info("Using AA.")
+                   data += sdata[:, 0, :].squeeze()
+                elif pol == 1:
+                    logger.info("Using BB")
+                    data += sdata[:, 1, :].squeeze()
+                elif pol == 2:
+                    logger.info("Using CR")
+                    data += sdata[:, 2, :].squeeze()
+                elif pol == 3:
+                    logger.info("Using CI")
+                    data += sdata[:, 3, :].squeeze()
+               
             elif len(shp) == 3 and shp[1] == self.npoln and self.poln_order == "IQUV":
                 logger.warning("Polarization is IQUV")
                 data = np.zeros((self.nsamp_per_subint, self.nchan), dtype=np.float32)
@@ -251,6 +262,9 @@ class PsrfitsFile(object):
                 elif pol == 4:
                     logger.info("Calculating vertical linear polarisation data.")
                     data = data + ((sdata[:, 0, :] - sdata[:, 1, :]) / 2).squeeze()
+                elif pol == 5:
+                     logger.info("Just using Stokes U.")
+                     data += sdata[:, 2, :].squeeze()
                 else:
                     raise ValueError(f"pol={pol} value not supported.")
             elif len(shp) == 4 and shp[-1] == 2 and self.poln_order == "IQUV":
