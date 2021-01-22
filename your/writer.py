@@ -73,10 +73,10 @@ class Writer:
         self.frequency_decimation_factor = frequency_decimation_factor
 
         if self.time_decimation_factor > 1:
-            raise NotImplementedError("We have not implemented this feature yet.")
+            time_decimation_factor = self.time_decimation_factor
 
         if self.frequency_decimation_factor > 1:
-            raise NotImplementedError("We have not implemented this feature yet.")
+            frequency_decimation_factor = self.frequency_decimation_factor
 
         self.outdir = outdir
         self.outname = outname
@@ -152,8 +152,15 @@ class Writer:
             self.your_object.your_header.tstart
             + self.nstart * self.your_object.your_header.tsamp / (60 * 60 * 24)
         )
+    def frequency_decimation_factor(self):
+        return (self.frquency_decimation_factor)
+    
+    def time_decimation_factor(self):
+        return(self.time_decimation_factor)
+           
+       
 
-    def get_data_to_write(self, start_sample, nsamp):
+    def get_data_to_write(self, start_sample, nsamp, time_Decimation_factor, frequency_decimation_factor):
         """
 
         Read data to self.data, selects channels
@@ -163,9 +170,11 @@ class Writer:
 
             start_sample (int): Start sample number to read from
             nsamp (int): Number of samples to read
+	    time_decimation_factor(int): Number of time samples to average
+	    frequency_decimation_factor(int): Number of frequency channels to average 
 
         """
-        data = self.your_object.get_data(start_sample, nsamp)
+        data = self.your_object.get_data(start_sample, nsamp, time_decimation_factor=self.time_decimation_factor, frequency_decimation_factor=self.frequency_decimation_factor)
         data = data[:, self.chan_min : self.chan_max]
         if self.flag_rfi:
             mask = sk_sg_filter(
@@ -217,12 +226,13 @@ class Writer:
             # get the nstart and number of samples to write
             start_sample = self.nstart
             samples_left = self.nsamp
-
+            time_decimation_factor = self.time_decimation_factor
+            frequency_decimation_factor = self.frequency_decimation_factor
             # open the file
             with open(self.outname, "ab") as f:
                 # read till there are spectra to read
                 while samples_left > 0:
-                    self.get_data_to_write(start_sample, self.gulp)
+                    self.get_data_to_write(start_sample, self.gulp, time_decimation_factor,frequency_decimation_factor)
                     start_sample += self.gulp
                     samples_left -= self.gulp
                     # goto the end of the file and dump
