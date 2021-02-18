@@ -76,7 +76,7 @@ class Your(PsrfitsFile, SigprocFile):
             logger.info(
                 f"Source name not present in the file. Setting source name to TEMP"
             )
-            self.source_name = "TEMP"
+        self.source_name = "TEMP"
         self.your_header = Header(self)
 
     @property
@@ -84,7 +84,7 @@ class Your(PsrfitsFile, SigprocFile):
         """
         Returns: numpy array of channel frequencies
         """
-        return self.fch1 + np.arange(self.nchans) * self.foff
+        return self.fch1 + np.arange(self.your_header.nchans) * self.your_header.foff
 
     @property
     def native_tsamp(self):
@@ -239,7 +239,7 @@ class Your(PsrfitsFile, SigprocFile):
                     logging.warning(
                         f"pol: {pol}, Assuming IQUV polarisation data in Filterbank file"
                     )
-        data = self.formatclass.get_data(self, nstart, nsamp, frequency_decimation_factor=self.frequency_decimation_factor, time_decimation_factor=self.time_decimation_factor, pol=pol)[:, 0, :]
+        data = self.formatclass.get_data(self, nstart, nsamp, pol=pol)[:, 0, :]
 
         if (self.your_header.time_decimation_factor > 1) or (
             self.your_header.frequency_decimation_factor > 1
@@ -355,7 +355,7 @@ class Header:
         else:
             raise ValueError(f"Unsupported number of bits {self.nbits}")
 
-        self.time_decimation_factor = 1 
+        self.time_decimation_factor = 1
         self.frequency_decimation_factor = 1
         self.native_tsamp = your.native_tsamp
         self.native_foff = your.native_foff
