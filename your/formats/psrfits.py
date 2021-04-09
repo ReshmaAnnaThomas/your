@@ -265,6 +265,12 @@ class PsrfitsFile(object):
                 elif pol == 5:
                      logger.info("Just using Stokes U.")
                      data += sdata[:, 2, :].squeeze()
+                elif pol == 6:
+                     logger.info("Just using Stokes Q.")
+                     data += sdata[:, 1, :].squeeze()
+                elif pol == 7:
+                     logger.info("Just using Stokes V.")
+                     data += sdata[:, 3, :].squeeze()
                 else:
                     raise ValueError(f"pol={pol} value not supported.")
             elif len(shp) == 4 and shp[-1] == 2 and self.poln_order == "IQUV":

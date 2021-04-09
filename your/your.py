@@ -221,10 +221,10 @@ class Your(PsrfitsFile, SigprocFile):
                 f"frequency_decimation_factor: {self.your_header.frequency_decimation_factor} should be a divisor or nchans:{self.nchans}"
             )
 
-        if pol not in [0, 1, 2, 3, 4, 5]:
+        if pol not in [0, 1, 2, 3, 4, 5,6,7]:
             raise ValueError(
                 f"pol: {pol} can only be one of 0 (Intensity), 1 (Right Circular), 2 (Left Circular), "
-                "3 (Horizontal Linear), 4 (Vertical Linear), 5 (Stokes U) "
+                "3 (Horizontal Linear), 4 (Vertical Linear), 5 (Stokes U), 6 (Stokes Q), 7 (Stokes V) "
             )
 
         if self.format == "fil":
